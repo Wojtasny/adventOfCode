@@ -1,11 +1,11 @@
 package day1;
 
-public class MassCalculator implements ITheTyrannyOfTheRocketEquation{
+class MassCalculator implements ITheTyrannyOfTheRocketEquation{
 
     private int divider;
     private int substractor;
 
-    public MassCalculator() {
+    MassCalculator() {
         this.divider = divide;
         this.substractor = subtractor;
     }

@@ -17,7 +17,7 @@ class RecurentFuelCalculatorTest {
     private static List<Long> modulesMasses;
 
     @BeforeAll
-    public static void init() throws IOException {
+    static void init() throws IOException {
         modulesMasses = new ArrayList<>();
         File file = new File("D:\\git\\web-kmf\\adventOfCode\\resources\\input.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));

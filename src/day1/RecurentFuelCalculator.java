@@ -1,16 +1,16 @@
 package day1;
 
-public class RecurentFuelCalculator extends MassCalculator{
+class RecurentFuelCalculator extends MassCalculator{
     private int divider;
     private int substractor;
 
 
-    public RecurentFuelCalculator() {
+    RecurentFuelCalculator() {
         this.divider = divide;
         this.substractor = subtractor;
     }
 
-    public long recurrentCalculateFor(long mass) {
+    long recurrentCalculateFor(long mass) {
         long fuel = calculateFor(mass);
         if (fuel <=0 ){
             return 0;
