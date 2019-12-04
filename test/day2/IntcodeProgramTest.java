@@ -6,12 +6,29 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class IntcodeProgramTest {
 
     private static int[] programCodeArray;
+
+    @Test
+    public void validateSampleInputOnCleverProgram(){
+        int[] intcodeInput = {1,0,0,0,99};
+        List<Integer> intcodeOuput = Arrays.asList(2,0,0,0,99);
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
+        assertEquals(intcodeOuput, cip.execute());
+    }
+
+    @Test
+    public void validateSampleInputOnCleverProgram2(){
+        int[] intcodeInput = {1,1,1,4,99,5,6,0,99};
+        List<Integer> intcodeOuput = Arrays.asList(30,1,1,4,2,5,6,0,99);
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
+        assertEquals(intcodeOuput, cip.execute());
+    }
 
     @Test
     public void validateSampleInput(){
@@ -103,6 +120,6 @@ class IntcodeProgramTest {
         String line = br.readLine();
         List<String> programCodeString = Arrays.asList(line.split(","));
         programCodeArray = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray();
-        System.out.println(Arrays.toString(programCodeArray));
+//        System.out.println(Arrays.toString(programCodeArray));
     }
 }
