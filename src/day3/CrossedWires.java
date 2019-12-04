@@ -1,22 +1,21 @@
 package day3;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-public class CrossedWires {
+class CrossedWires {
 
 
     private static HashSet<Intersection> crossings = new HashSet<>();
+    private static HashMap<Intersection, Integer> crossingsWithStepsMap = new HashMap<>();
     private Intersection currentPosition;
 
     private static class Intersection{
         Integer x;
         Integer y;
 
-        public Intersection(Integer x, Integer y) {
+        Intersection(Integer x, Integer y) {
             this.x = x;
             this.y = y;
         }
@@ -38,15 +37,47 @@ public class CrossedWires {
     }
 
     private Supplier<RuntimeException> fail(){
-        return new Supplier<RuntimeException>() {
-            @Override
-            public RuntimeException get() {
-                return new IllegalArgumentException("Unknown opcode");
-            }
-        };
+        return () -> new IllegalArgumentException("Unknown opcode");
     }
 
-    public void parseWire(List<String> wireInstructions){
+    private void getSteps(List<String> wireInstructions){
+        for (Intersection intersection :
+                crossings ) {
+            crossingsWithStepsMap.put(intersection, 0);
+            for (String wireInstruction :
+                    wireInstructions) {
+                int steps = crossingsWithStepsMap.get(intersection);
+                crossingsWithStepsMap.put(intersection, steps + stepsToIntersection(wireInstruction, intersection));
+            }
+        }
+    }
+
+    int getMinSteps(List<String> wireInstructions){
+        getSteps(wireInstructions);
+        Map.Entry<Intersection, Integer> min = Collections.min(crossingsWithStepsMap.entrySet(), Comparator.comparing(Map.Entry::getValue));
+        return min.getValue();
+    }
+
+    private int stepsToIntersection(String wireInstruction, Intersection finalIntersection){
+        String[] instructions = wireInstruction.split(",");
+        int steps=0;
+        updateCurrentPosition(new Intersection(0,0));
+        for(String wireFlow: instructions){
+            String direction = wireFlow.substring(0,1);
+            int distance = Integer.parseInt(wireFlow.substring(1));
+            for(int n=0; n<distance; n++){
+                steps++;
+                draw(direction, currentPosition,
+                        this::updateCurrentPosition,
+                        fail());
+                if (currentPosition.equals(finalIntersection)) break;
+            }
+            if (currentPosition.equals(finalIntersection)) break;
+        }
+        return steps;
+    }
+
+    void parseWire(List<String> wireInstructions){
         List<HashSet<Intersection>> listOfGrids = new ArrayList<>();
         for(String wireInstruction: wireInstructions){
             HashSet<Intersection> grid = new HashSet<>();
@@ -58,10 +89,7 @@ public class CrossedWires {
                 for(int n=0; n<distance; n++){
                     draw(direction, currentPosition,
                             (Intersection intersection) -> {
-                        grid.add(intersection);
-//                                if(!grid.add(intersection)){
-//                                    crossings.add(intersection);
-//                                }
+                                grid.add(intersection);
                                 updateCurrentPosition(intersection);
                             },
                             fail());

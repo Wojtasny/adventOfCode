@@ -21,6 +21,7 @@ class CrossedWiresTest {
         instructionsLines.add("U62,R66,U55,R34,D71,R55,D58,R83");
         cw.parseWire(instructionsLines);
         assertEquals(159, cw.getMinDist());
+        assertEquals(610, cw.getMinSteps(instructionsLines));
     }
 
     @Test
@@ -31,6 +32,7 @@ class CrossedWiresTest {
         instructionsLines.add("U98,R91,D20,R16,D67,R40,U7,R15,U6,R7");
         cw.parseWire(instructionsLines);
         assertEquals(135, cw.getMinDist());
+        assertEquals(410, cw.getMinSteps(instructionsLines));
     }
 
     @Test
@@ -40,6 +42,7 @@ class CrossedWiresTest {
         CrossedWires cw = new CrossedWires();
         cw.parseWire(instructionsLines);
         assertEquals(489, cw.getMinDist());
+        assertEquals(93654, cw.getMinSteps(instructionsLines));
     }
 
     private List<String> loadInput() throws IOException {
