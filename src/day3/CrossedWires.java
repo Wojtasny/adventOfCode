@@ -4,11 +4,14 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class CrossedWires {
 
-    private static HashSet<Intersection> grid = new HashSet<>();
-    private static ArrayList<Intersection> crossings = new ArrayList<>();
+
+    private static HashSet<Intersection> crossings = new HashSet<>();
+    private Intersection currentPosition;
+
     private static class Intersection{
         Integer x;
         Integer y;
@@ -20,14 +23,14 @@ public class CrossedWires {
 
         @Override
         public int hashCode() {
-            return (int)(Math.abs(this.x) + Math.abs(this.y));
+            return (Math.abs(this.x) + Math.abs(this.y));
         }
 
         @Override
         public boolean equals(Object obj) {
             if(obj instanceof Intersection){
                 Intersection b = (Intersection) obj;
-                return (this.x == b.x) && (this.y == b.y);
+                return (this.x.equals(b.x)) && (this.y.equals(b.y));
             } else {
                 return false;
             }
@@ -44,25 +47,43 @@ public class CrossedWires {
     }
 
     public void parseWire(List<String> wireInstructions){
-        AtomicReference<Intersection> currentPosition = new AtomicReference<>(new Intersection(0, 0));
-
+        List<HashSet<Intersection>> listOfGrids = new ArrayList<>();
         for(String wireInstruction: wireInstructions){
+            HashSet<Intersection> grid = new HashSet<>();
+            updateCurrentPosition(new Intersection(0, 0));
             String[] instructions = wireInstruction.split(",");
             for(String wireFlow: instructions){
                 String direction = wireFlow.substring(0,1);
                 int distance = Integer.parseInt(wireFlow.substring(1));
-                for(int n=0; n<=distance; n++){
-                    draw(direction, currentPosition.get(),
+                for(int n=0; n<distance; n++){
+                    draw(direction, currentPosition,
                             (Intersection intersection) -> {
-                                if(!grid.add(intersection)){
-                                    crossings.add(intersection);
-                                }
-                                currentPosition.set(intersection);
+                        grid.add(intersection);
+//                                if(!grid.add(intersection)){
+//                                    crossings.add(intersection);
+//                                }
+                                updateCurrentPosition(intersection);
                             },
                             fail());
                 }
             }
+            listOfGrids.add(grid);
         }
+        getCrossings(listOfGrids);
+    }
+
+    private void getCrossings(List<HashSet<Intersection>> listOfGrids) {
+        List<HashSet<Intersection>> tmpList = new ArrayList<>(listOfGrids);
+        crossings = tmpList.get(0);
+        tmpList.remove(0);
+        for (HashSet<Intersection> grid :
+                tmpList) {
+            crossings.retainAll(grid);
+        }
+    }
+
+    private void updateCurrentPosition(Intersection intersection) {
+        this.currentPosition = intersection;
     }
 
     Integer getMinDist() {
