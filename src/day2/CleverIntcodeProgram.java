@@ -1,5 +1,7 @@
 package day2;
 
+import day4.ElvesPasswordCounter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,36 +16,41 @@ public class CleverIntcodeProgram {
     private static final Integer ARG_1 = 1;
     private static final Integer ARG_2 = 2;
 
+
     List<Integer> inputProgram = new ArrayList<>();
-    List<Integer> promgram = new ArrayList<>();
+    List<Integer> program = new ArrayList<>();
 
     CleverIntcodeProgram(List<Integer> program){
         this.inputProgram.addAll(program);
     }
+
+    public CleverIntcodeProgram() {
+    }
+
     public List<Integer> execute() {
-        promgram.addAll(inputProgram);
-        assert promgram.size() > 0;
+        program.addAll(inputProgram);
+        assert program.size() > 0;
         int iterator = 0;
-        while(!TERMINATING_OPCODE.equals(promgram.get(iterator))){
-            assert promgram.size() >= iterator + 4;
-            List<Integer> subList = promgram.subList(iterator, iterator +4);
+        while(!TERMINATING_OPCODE.equals(program.get(iterator))){
+            assert program.size() >= iterator + 4;
+            List<Integer> subList = program.subList(iterator, iterator +4);
             Integer marker = subList.get(MARKER_INDEX);
             Integer whereToPlaceResult = subList.get(WHERE_TO_PUT_RESULT_INDEX);
 
             Integer arg1Index = subList.get(ARG_1);
             Integer arg2Index = subList.get(ARG_2);
-            Integer arg1 = promgram.get(arg1Index);
-            Integer arg2 = promgram.get(arg2Index);
+            Integer arg1 = program.get(arg1Index);
+            Integer arg2 = program.get(arg2Index);
 
-            singleLoop(marker, arg1, arg2,
-                    (Integer result) -> promgram.set(whereToPlaceResult, result),
+            singleInstruction(marker, arg1, arg2,
+                    (Integer result) -> program.set(whereToPlaceResult, result),
                     fail());
             iterator += 4;
         }
-        return promgram;
+        return program;
     }
 
-    private void singleLoop(Integer marker, Integer arg1, Integer arg2, Consumer<Integer> onSuccess, Supplier<RuntimeException> onFailure) {
+    private void singleInstruction(Integer marker, Integer arg1, Integer arg2, Consumer<Integer> onSuccess, Supplier<RuntimeException> onFailure) {
         Integer toSave = Opcodes.get(marker).map(opcode -> opcode.run(arg1, arg2)).orElseThrow(onFailure);
         onSuccess.accept(toSave);
     }
