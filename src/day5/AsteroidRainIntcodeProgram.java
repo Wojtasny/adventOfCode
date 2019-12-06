@@ -19,17 +19,26 @@ public class AsteroidRainIntcodeProgram {
     List<Integer> output = new ArrayList<>();
     private int marker;
 
-    public AsteroidRainIntcodeProgram(List<Integer> programInstruction) {
-        this.inputProgram = programInstruction;
+    public void setInputProgram(List<Integer> inputProgram) {
+        this.inputProgram = inputProgram;
     }
 
-    public List<Integer> getProgram() {
-        return program;
+    public void setInputValue(int inputValue) {
+        this.inputValue = inputValue;
+    }
+
+    private int inputValue;
+
+    public AsteroidRainIntcodeProgram() {
+    }
+
+    public int getResult() {
+        return output.get(output.size()-1);
     }
 
     List<Integer> program = new ArrayList<>();
 
-    public void execute(){
+    public int execute(){
         program.addAll(inputProgram);
         marker = 0;
         int par1 ;
@@ -53,19 +62,58 @@ public class AsteroidRainIntcodeProgram {
                     marker+=4;
                     break;
                 case 3:
-                    par1 = getArgument(instruction.par1mode, FIRST_ARG);
-                    program.set(par1,par1);
+                    par1 = getArgument(1, FIRST_ARG);
+                    program.set(par1,inputValue);
                     marker+=2;
                     break;
                 case 4:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     output.add(par1);
                     marker+=2;
+                    break;
+                case 5:
+                    par1 = getArgument(instruction.par1mode, FIRST_ARG);
+                    par2 = getArgument(instruction.par2mode, SECOND_ARG);
+                    if(par1 !=0) {
+                        marker = par2;
+                    } else {
+                        marker+=3;
+                    }
+                    break;
+                case 6:
+                    par1 = getArgument(instruction.par1mode, FIRST_ARG);
+                    par2 = getArgument(instruction.par2mode, SECOND_ARG);
+                    if(par1==0) {
+                        marker =par2;
+                    } else {
+                        marker+=3;
+                    }
+                    break;
+                case 7:
+                    par1 = getArgument(instruction.par1mode, FIRST_ARG);
+                    par2 = getArgument(instruction.par2mode, SECOND_ARG);
+                    par3 = program.get(marker+THIRD_ARG);
+                    if(par1<par2) {
+                        program.set(par3, 1);
+                    } else {
+                        program.set(par3, 0);
+                    }
+                    marker+=4;
+                    break;
+                case 8:
+                    par1 = getArgument(instruction.par1mode, FIRST_ARG);
+                    par2 = getArgument(instruction.par2mode, SECOND_ARG);
+                    par3 = program.get(marker+THIRD_ARG);
+                    if(par1==par2) {
+                        program.set(par3, 1);
+                    } else {
+                        program.set(par3, 0);
+                    }
+                    marker+=4;
             }
-            System.out.println(output.toString());
             instruction = parseInstructionOpcode(program.get(marker));
-
         }
+        return getResult();
     }
 
 
@@ -83,18 +131,10 @@ public class AsteroidRainIntcodeProgram {
             case POSITION_MODE:
                 int position = program.get(marker+nthArg);
                 arg = program.get(position);
-                if(arg<0){
-                    return 100 - arg;
-                } else {
-                    return arg;
-                }
+               return arg;
             case IMMEDIATE_MODE:
                 arg = program.get(marker+nthArg);
-                if(arg<0){
-                    return 100 - arg;
-                } else {
-                    return arg;
-                }
+                return arg;
                 default:
                     throw new IllegalArgumentException();
         }

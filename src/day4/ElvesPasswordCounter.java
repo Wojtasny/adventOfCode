@@ -40,11 +40,6 @@ public class ElvesPasswordCounter {
         return false;
     }
 
-    private boolean isDoubleDigitPartOfLargerGroup(LinkedList<Integer> numberAsList, int doubleDigit){
-        long count = numberAsList.stream().filter(n -> n.equals(doubleDigit)).count();
-        return count > 2;
-    }
-
     public int countPossiblePass(){
         int counter = 0;
         for (int n=START; n<= END; n++){
