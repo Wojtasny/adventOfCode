@@ -20,12 +20,12 @@ class ElvesPasswordCounterTest {
         System.out.println(elvesPasswordCounter.countPossiblePassAdvanced());
     }
 
-    @Test
-    void validatePossiblePassAdvancedSample1(){
-        ElvesPasswordCounter elvesPasswordCounter = new ElvesPasswordCounter();
-        assertTrue(elvesPasswordCounter.validatePossiblePassAdvanced(112233));
-        assertFalse(elvesPasswordCounter.validatePossiblePassAdvanced(123444));
-        assertTrue(elvesPasswordCounter.validatePossiblePassAdvanced(111122));
-
-    }
+//    @Test
+//    void validatePossiblePassAdvancedSample1(){
+//        ElvesPasswordCounter elvesPasswordCounter = new ElvesPasswordCounter();
+//        assertTrue(elvesPasswordCounter.validatePossiblePassAdvanced(112233));
+//        assertFalse(elvesPasswordCounter.validatePossiblePassAdvanced(123444));
+//        assertTrue(elvesPasswordCounter.validatePossiblePassAdvanced(111122));
+//
+//    }
 }

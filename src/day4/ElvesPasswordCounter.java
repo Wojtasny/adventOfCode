@@ -1,9 +1,6 @@
 package day4;
 
-import java.util.ArrayList;
-import java.util.IntSummaryStatistics;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ElvesPasswordCounter {
     private final static int START = 256310;
@@ -32,15 +29,15 @@ public class ElvesPasswordCounter {
         return wasDouble;
     }
 
-    public boolean validatePossiblePassAdvanced(Integer number) {
+    private boolean validatePossiblePassAdvanced(Integer number) {
         LinkedList<Integer> numberAsList = (LinkedList<Integer>) int2List(number);
-        int doubleDigit = 0;
-
         for (int i=0; i<numberAsList.size()-1; i++){
-            if(numberAsList.get(i+1) < numberAsList.get(i)) return false;
-            if(numberAsList.get(i+1).equals(numberAsList.get(i))) doubleDigit = numberAsList.get(i);
+            if(numberAsList.get(i+1).equals(numberAsList.get(i)) &&
+                    (Collections.frequency(numberAsList, numberAsList.get(i))) == 2) {
+                return true;
+            }
         }
-        return !isDoubleDigitPartOfLargerGroup(numberAsList, doubleDigit);
+        return false;
     }
 
     private boolean isDoubleDigitPartOfLargerGroup(LinkedList<Integer> numberAsList, int doubleDigit){
@@ -67,17 +64,6 @@ public class ElvesPasswordCounter {
                 counter ++;
             }
         }
-//        for (int n=START; n<= END; n++){
-//            if(validatePossiblePassAdvanced(n)) {
-//                counter++;
-//                met.add(n);
-//            } else {
-//                notMet.add(n);
-//            }
-//        }
-//        System.out.println(notMet.size() + 517);
-//        System.out.println(met.size());
-//        met.forEach(System.out::println);
         return counter;
     }
 }
