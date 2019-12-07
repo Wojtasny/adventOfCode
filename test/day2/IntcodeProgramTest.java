@@ -20,16 +20,18 @@ class IntcodeProgramTest {
     public void validateSampleInputOnCleverProgram(){
         int[] intcodeInput = {1,0,0,0,99};
         List<Integer> intcodeOuput = Arrays.asList(2,0,0,0,99);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
-        assertEquals(intcodeOuput, cip.execute());
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()), 0);
+        cip.execute();
+        assertEquals(intcodeOuput, cip.getProgram());
     }
 
     @Test
     public void validateSampleInputOnCleverProgram2(){
         int[] intcodeInput = {1,1,1,4,99,5,6,0,99};
         List<Integer> intcodeOuput = Arrays.asList(30,1,1,4,2,5,6,0,99);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
-        assertEquals(intcodeOuput, cip.execute());
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()), 0);
+        cip.execute();
+        assertEquals(intcodeOuput, cip.getProgram());
     }
 
     @Test
@@ -87,8 +89,9 @@ class IntcodeProgramTest {
     void processExcerciseInputWithCleverProgram(){
         programCodeList.set(1, 12);
         programCodeList.set(2, 2);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(programCodeList);
-        assertEquals( 2692315, cip.execute().get(0));
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(programCodeList, 0);
+        cip.execute();
+        assertEquals( 2692315, cip.getProgram().get(0));
     }
 
     @Test
@@ -149,7 +152,7 @@ class IntcodeProgramTest {
 
     @BeforeAll
     public static void setup() throws IOException {
-        File file = new File("D:\\git\\web-kmf\\adventOfCode\\resources\\inputday2.txt");
+        File file = new File("C:\\Users\\PTM867\\Documents\\adventOfCode\\resources\\inputday2.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line = br.readLine();
         List<String> programCodeString = Arrays.asList(line.split(","));
