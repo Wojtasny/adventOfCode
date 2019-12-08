@@ -8,21 +8,21 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
 
     private boolean halted = false;
 
-    Map<int[], Integer> phaseSettingOutputValueMap = new HashMap<>();
-    Map<int[], Integer> phaseSettingWithFeedbackOutputValueMap = new HashMap<>();
-    private int[] permutationInitArray = {0,1,2,3,4};
-    private int[] permutationFeedbackArray = {5,6,7,8,9};
+    private Map<int[], Integer> phaseSettingOutputValueMap = new HashMap<>();
+    private Map<int[], Integer> phaseSettingWithFeedbackOutputValueMap = new HashMap<>();
 
     AmplificationCircuit(List<Integer> program){
         super(program);
+        int[] permutationInitArray = {0, 1, 2, 3, 4};
         getAllPermutations(permutationInitArray.length, permutationInitArray, permutationList);
+        int[] permutationFeedbackArray = {5, 6, 7, 8, 9};
         getAllPermutations(permutationFeedbackArray.length, permutationFeedbackArray, permutationFeedbackList);
         this.program.addAll(inputProgram);
         marker = 0;
     }
 
-    List<int[]> permutationList = new ArrayList<>();
-    List<int[]> permutationFeedbackList = new ArrayList<>();
+    private List<int[]> permutationList = new ArrayList<>();
+    private List<int[]> permutationFeedbackList = new ArrayList<>();
 
     private void getAllPermutations(int n, int[] elements, List<int[]> whereToSave) {
         if(n == 1) {
@@ -107,7 +107,7 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
         return Collections.max(phaseSettingWithFeedbackOutputValueMap.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getValue();
     }
 
-    int executeWithFeedback(){
+    private int executeWithFeedback(){
 
         OpcodeAndModes instruction = parseInstructionOpcode(program.get(marker));
 
@@ -128,7 +128,7 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
         return output.get(output.size()-1);
     }
 
-    public boolean isHalted() {
+    private boolean isHalted() {
         return halted;
     }
 }

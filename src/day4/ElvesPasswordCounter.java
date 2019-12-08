@@ -1,12 +1,13 @@
 package day4;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ElvesPasswordCounter {
     private final static int START = 256310;
     private final static int END = 732736;
-    private ArrayList<Integer> notMet = new ArrayList<>();
-    private ArrayList<Integer> met = new ArrayList<>();
     private ArrayList<Integer> metRegular = new ArrayList<>();
 
     public static List<Integer> int2List(Integer number){
@@ -40,7 +41,7 @@ public class ElvesPasswordCounter {
         return false;
     }
 
-    public int countPossiblePass(){
+    int countPossiblePass(){
         int counter = 0;
         for (int n=START; n<= END; n++){
             if(validatePossiblePass(n)) {
@@ -51,7 +52,7 @@ public class ElvesPasswordCounter {
         return counter;
     }
 
-    public int countPossiblePassAdvanced(){
+    int countPossiblePassAdvanced(){
         int counter = 0;
         for (Integer regular :
                 metRegular) {

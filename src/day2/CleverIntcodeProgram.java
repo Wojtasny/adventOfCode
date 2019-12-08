@@ -26,7 +26,7 @@ public class CleverIntcodeProgram {
         this.inputProgram.addAll(program);
     }
 
-    public CleverIntcodeProgram() {
+    CleverIntcodeProgram() {
     }
 
     public void execute() {
@@ -90,13 +90,12 @@ public class CleverIntcodeProgram {
         }
     }
 
-    public List<Integer> getProgram() {
+    List<Integer> getProgram() {
         return program;
     }
 
     enum Opcodes {
         SUM(1, argList -> {
-//            program.set(argList.get(2) ,argList.get(0) + argList.get(1));
             List<Integer> toReturn = new ArrayList<>();
             toReturn.add(1);
             toReturn.add(argList.get(2));

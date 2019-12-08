@@ -2,7 +2,7 @@ package day2;
 
 import java.util.List;
 
-public class AdvancedCleverIntcodeProgram extends CleverIntcodeProgram {
+class AdvancedCleverIntcodeProgram extends CleverIntcodeProgram {
 
     AdvancedCleverIntcodeProgram(List<Integer> program, int noun, int verb) {
         this.program.clear();

@@ -36,7 +36,7 @@ class MassCalculatorTest {
     @BeforeAll
     public static void init() throws IOException {
         modulesMasses = new ArrayList<>();
-        File file = new File("D:\\git\\web-kmf\\adventOfCode\\resources\\input.txt");
+        File file = new File("C:\\Users\\PTM867\\Documents\\adventOfCode\\resources\\input.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         String string;

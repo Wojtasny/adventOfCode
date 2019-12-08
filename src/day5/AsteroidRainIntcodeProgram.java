@@ -5,9 +5,8 @@ import day4.ElvesPasswordCounter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BinaryOperator;
 
-public class AsteroidRainIntcodeProgram {
+class AsteroidRainIntcodeProgram {
     private static final int POSITION_MODE = 0;
     private static final int IMMEDIATE_MODE = 1;
     private static final int FIRST_ARG = 1;
@@ -15,30 +14,30 @@ public class AsteroidRainIntcodeProgram {
     private static final int THIRD_ARG = 3;
     private static final Integer TERMINATING_OPCODE = 99;
 
-    List<Integer> inputProgram = new ArrayList<>();
-    List<Integer> output = new ArrayList<>();
+    private List<Integer> inputProgram = new ArrayList<>();
+    private List<Integer> output = new ArrayList<>();
     private int marker;
 
-    public void setInputProgram(List<Integer> inputProgram) {
+    void setInputProgram(List<Integer> inputProgram) {
         this.inputProgram = inputProgram;
     }
 
-    public void setInputValue(int inputValue) {
+    void setInputValue(int inputValue) {
         this.inputValue = inputValue;
     }
 
     private int inputValue;
 
-    public AsteroidRainIntcodeProgram() {
+    AsteroidRainIntcodeProgram() {
     }
 
-    public int getResult() {
+    private int getResult() {
         return output.get(output.size()-1);
     }
 
-    List<Integer> program = new ArrayList<>();
+    private List<Integer> program = new ArrayList<>();
 
-    public int execute(){
+    int execute(){
         program.addAll(inputProgram);
         marker = 0;
         int par1 ;
@@ -126,7 +125,7 @@ public class AsteroidRainIntcodeProgram {
     }
 
     private int getArgument(Integer par1mode, int nthArg) {
-        int arg = 0;
+        int arg ;
         switch (par1mode){
             case POSITION_MODE:
                 int position = program.get(marker+nthArg);
