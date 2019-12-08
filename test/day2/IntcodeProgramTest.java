@@ -20,7 +20,7 @@ class IntcodeProgramTest {
     public void validateSampleInputOnCleverProgram(){
         int[] intcodeInput = {1,0,0,0,99};
         List<Integer> intcodeOuput = Arrays.asList(2,0,0,0,99);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()), 0);
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
         cip.execute();
         assertEquals(intcodeOuput, cip.getProgram());
     }
@@ -29,7 +29,7 @@ class IntcodeProgramTest {
     public void validateSampleInputOnCleverProgram2(){
         int[] intcodeInput = {1,1,1,4,99,5,6,0,99};
         List<Integer> intcodeOuput = Arrays.asList(30,1,1,4,2,5,6,0,99);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()), 0);
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
         cip.execute();
         assertEquals(intcodeOuput, cip.getProgram());
     }
@@ -89,7 +89,7 @@ class IntcodeProgramTest {
     void processExcerciseInputWithCleverProgram(){
         programCodeList.set(1, 12);
         programCodeList.set(2, 2);
-        CleverIntcodeProgram cip = new CleverIntcodeProgram(programCodeList, 0);
+        CleverIntcodeProgram cip = new CleverIntcodeProgram(programCodeList);
         cip.execute();
         assertEquals( 2692315, cip.getProgram().get(0));
     }

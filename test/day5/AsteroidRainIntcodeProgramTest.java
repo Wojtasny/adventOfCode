@@ -4,7 +4,6 @@ import day2.CleverIntcodeProgram;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +24,8 @@ class AsteroidRainIntcodeProgramTest {
         arip.setInputValue(1);
         assertEquals(15426686, arip.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram1 =  new CleverIntcodeProgram(programInstruction, 1);
+        CleverIntcodeProgram cleverIntcodeProgram1 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram1.offerInputValue(1);
         cleverIntcodeProgram1.execute();
         assertEquals(15426686, cleverIntcodeProgram1.getResult());
 
@@ -34,7 +34,8 @@ class AsteroidRainIntcodeProgramTest {
         arip2.setInputValue(5);
         System.out.println(arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram2 =  new CleverIntcodeProgram(programInstruction, 5);
+        CleverIntcodeProgram cleverIntcodeProgram2 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram2.offerInputValue(5);
         cleverIntcodeProgram2.execute();
         System.out.println(cleverIntcodeProgram2.getResult());
     }
@@ -46,7 +47,8 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip = setupProgram(programInstruction, inputValue);
         assertEquals(1, arip.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, inputValue);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(inputValue);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
@@ -54,7 +56,8 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip2 = setupProgram(programInstruction, inputValue);
         assertEquals(0, arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram2 = new CleverIntcodeProgram(programInstruction, inputValue);
+        CleverIntcodeProgram cleverIntcodeProgram2 = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram2.offerInputValue(inputValue);
         cleverIntcodeProgram2.execute();
         assertEquals(0, cleverIntcodeProgram2.getResult());
     }
@@ -66,7 +69,8 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip = setupProgram(programInstruction, inputValue);
         assertEquals(1, arip.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, inputValue);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(inputValue);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
@@ -75,7 +79,8 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip2 = setupProgram(programInstruction, inputValue);
         assertEquals(0, arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram2 = new CleverIntcodeProgram(programInstruction, inputValue);
+        CleverIntcodeProgram cleverIntcodeProgram2 = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram2.offerInputValue(inputValue);
         cleverIntcodeProgram2.execute();
         assertEquals(0, cleverIntcodeProgram2.getResult());
 
@@ -90,11 +95,13 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip2 = setupProgram(programInstruction, 11);
         assertEquals(0, arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, 8);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(8);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction, 11);
+        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram12.offerInputValue(11);
         cleverIntcodeProgram12.execute();
         assertEquals(0, cleverIntcodeProgram12.getResult());
     }
@@ -111,15 +118,18 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip3 = setupProgram(programInstruction, 8);
         assertEquals(0, arip3.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, 7);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(7);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction, 11);
+        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram12.offerInputValue(11);
         cleverIntcodeProgram12.execute();
         assertEquals(0, cleverIntcodeProgram12.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram13 =  new CleverIntcodeProgram(programInstruction, 8);
+        CleverIntcodeProgram cleverIntcodeProgram13 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram13.offerInputValue(8);
         cleverIntcodeProgram13.execute();
         assertEquals(0, cleverIntcodeProgram13.getResult());
     }
@@ -133,11 +143,13 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip2 = setupProgram(programInstruction, 0);
         assertEquals(0, arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, 7);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(7);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction, 0);
+        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram12.offerInputValue(0);
         cleverIntcodeProgram12.execute();
         assertEquals(0, cleverIntcodeProgram12.getResult());
     }
@@ -151,11 +163,13 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip2 = setupProgram(programInstruction, 0);
         assertEquals(0, arip2.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, 7);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(7);
         cleverIntcodeProgram.execute();
         assertEquals(1, cleverIntcodeProgram.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction, 0);
+        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram12.offerInputValue(0);
         cleverIntcodeProgram12.execute();
         assertEquals(0, cleverIntcodeProgram12.getResult());
     }
@@ -174,15 +188,18 @@ class AsteroidRainIntcodeProgramTest {
         AsteroidRainIntcodeProgram arip3 = setupProgram(programInstruction, 12);
         assertEquals(1001, arip3.execute());
 
-        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction, 7);
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(7);
         cleverIntcodeProgram.execute();
         assertEquals(999, cleverIntcodeProgram.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction, 8);
+        CleverIntcodeProgram cleverIntcodeProgram12 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram12.offerInputValue(8);
         cleverIntcodeProgram12.execute();
         assertEquals(1000, cleverIntcodeProgram12.getResult());
 
-        CleverIntcodeProgram cleverIntcodeProgram13 =  new CleverIntcodeProgram(programInstruction, 12);
+        CleverIntcodeProgram cleverIntcodeProgram13 =  new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram13.offerInputValue(12);
         cleverIntcodeProgram13.execute();
         assertEquals(1001, cleverIntcodeProgram13.getResult());
     }

@@ -2,29 +2,28 @@ package day2;
 
 import day4.ElvesPasswordCounter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class CleverIntcodeProgram {
-    private static final Integer TERMINATING_OPCODE = 99;
+    protected static final Integer TERMINATING_OPCODE = 99;
     private static final int POSITION_MODE = 0;
     private static final int IMMEDIATE_MODE = 1;
 
 
-    List<Integer> inputProgram = new ArrayList<>();
-    static List<Integer> program = new ArrayList<>();
-    static List<Integer> output = new ArrayList<>();
-    private static Integer inputValue;
-    private static int marker;
+    protected List<Integer> inputProgram = new ArrayList<>();
+    protected List<Integer> program = new ArrayList<>();
+    protected List<Integer> output = new ArrayList<>();
 
-    public CleverIntcodeProgram(List<Integer> program, Integer inputValue){
-        this.program.clear();
+    public void offerInputValue(Integer inputValue) {
+        this.inputQueue.offer(inputValue);
+    }
+
+    protected Deque<Integer> inputQueue = new ArrayDeque<>();
+    protected int marker;
+
+    public CleverIntcodeProgram(List<Integer> program){
         this.inputProgram.addAll(program);
-        this.inputValue = inputValue;
     }
 
     public CleverIntcodeProgram() {
@@ -46,69 +45,8 @@ public class CleverIntcodeProgram {
         return output.get(output.size()-1);
     }
 
-//    private List<Integer> prepareArgs(OpcodeAndModes opcodeAndModes) {
-//        List<Integer> integerList = new ArrayList<>();
-//        switch (opcodeAndModes.opcode){
-//            case 1:
-//            case 2:
-//            case 5:
-//            case 6:
-//            case 7:
-//            case 8:
-//                integerList = getTwoArgs(opcodeAndModes);
-//                break;
-//            case 3:
-//            case 4:
-//                integerList = getOneArg(opcodeAndModes);
-//                break;
-//
-//        }
-//        return integerList;
-//    }
 
-//    private List<Integer> getOneArg(OpcodeAndModes opcodeAndModes) {
-//        List<Integer> argList = new ArrayList<>();
-//        switch (opcodeAndModes.par1mode){
-//            case POSITION_MODE:
-//                int position = program.get(++marker);
-//                argList.add(program.get(position));
-//                break;
-//            case IMMEDIATE_MODE:
-//                argList.add(program.get(++marker));
-//                break;
-//            default:
-//                throw new IllegalArgumentException();
-//        }
-//        return argList;
-//    }
-
-//    private List<Integer> getTwoArgs(OpcodeAndModes opcodeAndModes) {
-//        List<Integer> argList = new ArrayList<>();
-//        switch (opcodeAndModes.par1mode){
-//            case POSITION_MODE:
-//                int position = program.get(++marker);
-//                argList.add(program.get(position));
-//                break;
-//            case IMMEDIATE_MODE:
-//                argList.add(program.get(++marker));
-//                break;
-//            default:
-//                throw new IllegalArgumentException();
-//        }
-//        switch (opcodeAndModes.par2mode) {
-//            case POSITION_MODE:
-//                int position = program.get(++marker);
-//                argList.add(program.get(position));
-//                break;
-//            case IMMEDIATE_MODE:
-//                argList.add(program.get(++marker));
-//            default:
-//                throw new IllegalArgumentException();
-//        }
-//        return argList;
-//    }
-
-    private OpcodeAndModes parseInstructionOpcode(Integer instructionOpcode) {
+    protected OpcodeAndModes parseInstructionOpcode(Integer instructionOpcode) {
         List<Integer> instructionOpcodeList = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0));
         List<Integer> opcodeList = ElvesPasswordCounter.int2List(instructionOpcode);
         int destIndex = instructionOpcodeList.size()-1;
@@ -128,8 +66,28 @@ public class CleverIntcodeProgram {
         return new OpcodeAndModes(opcode, par1mode, par2mode, par3mode);
     }
 
-    private void singleInstruction(Integer instructionMarker, List<Integer> argList, Supplier<RuntimeException> onFailure) {
-        marker = Opcodes.get(instructionMarker).map(opcode -> opcode.run(argList)).orElseThrow(onFailure);
+    protected void singleInstruction(Integer instructionOpcode, List<Integer> argList, Supplier<RuntimeException> onFailure) {
+        // 1st output parameter is what to do with marker
+        // 2nd index where to put counted value
+        // counted value
+        List<Integer> outputParameters = Opcodes.get(instructionOpcode).map(opcode -> opcode.run(argList)).orElseThrow(onFailure);
+        if(outputParameters.size() == 1) {
+            if (outputParameters.get(0) != null) {
+                marker = outputParameters.get(0);
+            }
+        } else {
+            marker += outputParameters.get(0);
+        }
+        if (outputParameters.size() == 3) {
+            program.set(outputParameters.get(1), outputParameters.get(2));
+        }
+        if (outputParameters.size() == 2){
+            if(instructionOpcode == 3){
+                program.set(outputParameters.get(1), inputQueue.poll());
+            } else if(instructionOpcode == 4){
+                output.add(outputParameters.get(1));
+            }
+        }
     }
 
     public List<Integer> getProgram() {
@@ -138,44 +96,71 @@ public class CleverIntcodeProgram {
 
     enum Opcodes {
         SUM(1, argList -> {
-            program.set(argList.get(2) ,argList.get(0) + argList.get(1));
-            return ++marker;
+//            program.set(argList.get(2) ,argList.get(0) + argList.get(1));
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(1);
+            toReturn.add(argList.get(2));
+            toReturn.add(argList.get(0) + argList.get(1));
+            return toReturn;
         }),
         MULTIPLY(2, argList -> {
-            program.set(argList.get(2) ,argList.get(0) * argList.get(1));
-            return ++marker;
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(1);
+            toReturn.add(argList.get(2));
+            toReturn.add(argList.get(0) * argList.get(1));
+            return toReturn;
         }),
         STORE(3, argList -> {
-            program.set(argList.get(0), inputValue);
-            return marker-1;
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(-1);
+            toReturn.add(argList.get(0));
+            return toReturn;
         }),
         OUTPUTS(4, argList -> {
-            output.add(argList.get(0));
-            return marker-1;
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(-1);
+            toReturn.add(argList.get(0));
+            return toReturn;
         }),
         JUMPIFTRUE(5, argList -> {
-            if(argList.get(0)!=0) return argList.get(1);
-            return marker;
+            List<Integer> toReturn = new ArrayList<>();
+            if(argList.get(0)!=0) {
+                toReturn.add(argList.get(1));
+            } else {
+                toReturn.add(null);
+            }
+            return toReturn;
         }),
         JUMPIFFALSE(6, argList -> {
-            if(argList.get(0)==0) return argList.get(1);
-            return marker;
+            List<Integer> toReturn = new ArrayList<>();
+            if(argList.get(0)==0) {
+                toReturn.add(argList.get(1));
+            } else {
+                toReturn.add(null);
+            }
+            return toReturn;
         }),
         LESSTHAN(7, argList -> {
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(1);
+            toReturn.add(argList.get(2));
             if(argList.get(0) < argList.get(1)) {
-                program.set(argList.get(2), 1);
+                toReturn.add(1);
             } else {
-                program.set(argList.get(2), 0);
+                toReturn.add(0);
             }
-            return ++marker;
+            return toReturn;
         }),
         EQUALS(8, argList -> {
+            List<Integer> toReturn = new ArrayList<>();
+            toReturn.add(1);
+            toReturn.add(argList.get(2));
             if(argList.get(0).equals(argList.get(1))) {
-                program.set(argList.get(2), 1);
+                toReturn.add(1);
             } else {
-                program.set(argList.get(2), 0);
+                toReturn.add(0);
             }
-            return ++marker;
+            return toReturn;
         });
 
 
@@ -197,10 +182,10 @@ public class CleverIntcodeProgram {
 
     @FunctionalInterface
     interface Opcode {
-        Integer run(List<Integer> argList);
+        List<Integer> run(List<Integer> argList);
     }
 
-    private Supplier<RuntimeException> fail(){
+    protected Supplier<RuntimeException> fail(){
         return new Supplier<RuntimeException>() {
             @Override
             public RuntimeException get() {
@@ -208,8 +193,8 @@ public class CleverIntcodeProgram {
             }
         };
     }
-    private class OpcodeAndModes{
-        int opcode;
+    protected class OpcodeAndModes{
+        public int opcode;
         int par1mode;
         int par2mode;
         int par3mode;
@@ -222,15 +207,25 @@ public class CleverIntcodeProgram {
         }
     }
 
-    private List<Integer> getAllArguments(OpcodeAndModes opcodeAndModes){
+    protected List<Integer> getAllArguments(OpcodeAndModes opcodeAndModes){
         List<Integer> allArguments = new ArrayList<>();
         try {
             allArguments.add(getArgument(opcodeAndModes.par1mode));
+        } catch (IndexOutOfBoundsException e) {
+            //we are aware that we not always are able to get all arguments, but we need to remember to update marker
+//            marker++;
+        }
+        try {
             allArguments.add(getArgument(opcodeAndModes.par2mode));
+        } catch (IndexOutOfBoundsException e) {
+            //we are aware that we not always are able to get all arguments, but we need to remember to update marker
+//            marker++;
+        }
+        try {
             allArguments.add(program.get(++marker));
         } catch (IndexOutOfBoundsException e) {
             //we are aware that we not always are able to get all arguments, but we need to remember to update marker
-            marker++;
+//            marker++;
         }
         return allArguments;
     }
