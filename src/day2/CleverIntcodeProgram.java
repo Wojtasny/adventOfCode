@@ -9,20 +9,28 @@ public class CleverIntcodeProgram {
     protected static final Integer TERMINATING_OPCODE = 99;
     private static final int POSITION_MODE = 0;
     private static final int IMMEDIATE_MODE = 1;
+    private static final int RELATIVE_MODE = 2;
 
 
-    protected List<Integer> inputProgram = new ArrayList<>();
-    protected List<Integer> program = new ArrayList<>();
-    protected List<Integer> output = new ArrayList<>();
+    protected List<Long> inputProgram = new ArrayList<>();
+    protected List<Long> program = new ArrayList<>();
+    private OpcodeAndModes instruction;
 
-    public void offerInputValue(Integer inputValue) {
+    public List<Long> getOutputList() {
+        return output;
+    }
+
+    protected List<Long> output = new ArrayList<>();
+
+    public void offerInputValue(Long inputValue) {
         this.inputQueue.offer(inputValue);
     }
 
-    protected Deque<Integer> inputQueue = new ArrayDeque<>();
+    protected Deque<Long> inputQueue = new ArrayDeque<>();
     protected int marker;
+    protected int relativeBase;
 
-    public CleverIntcodeProgram(List<Integer> program){
+    public CleverIntcodeProgram(List<Long> program){
         this.inputProgram.addAll(program);
     }
 
@@ -32,16 +40,17 @@ public class CleverIntcodeProgram {
     public void execute() {
         program.addAll(inputProgram);
         marker = 0;
-        OpcodeAndModes instruction = parseInstructionOpcode(program.get(marker));
+        relativeBase = 0;
+        instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
 
         while(!TERMINATING_OPCODE.equals(instruction.opcode)){
-            List<Integer> argList = getAllArguments(instruction);
+            List<Long> argList = getAllArguments(instruction);
             singleInstruction(instruction.opcode, argList, fail());
-            instruction = parseInstructionOpcode(program.get(marker));
+            instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
         }
     }
 
-    public int getResult() {
+    public long getResult() {
         return output.get(output.size()-1);
     }
 
@@ -58,71 +67,85 @@ public class CleverIntcodeProgram {
         int par1mode = instructionOpcodeList.get(2);
 
         // because in mode 3 we want to get position not value under that address
-        if(opcode == 3) {
-            par1mode = 1;
-        }
+//        if(opcode == 3) {
+//            par1mode = 1;
+//        }
         int par2mode = instructionOpcodeList.get(1);
         int par3mode = instructionOpcodeList.get(0);
         return new OpcodeAndModes(opcode, par1mode, par2mode, par3mode);
     }
 
-    protected void singleInstruction(Integer instructionOpcode, List<Integer> argList, Supplier<RuntimeException> onFailure) {
+    protected void singleInstruction(Integer instructionOpcode, List<Long> argList, Supplier<RuntimeException> onFailure) {
         // 1st output parameter is what to do with marker
         // 2nd index where to put counted value
         // counted value
-        List<Integer> outputParameters = Opcodes.get(instructionOpcode).map(opcode -> opcode.run(argList)).orElseThrow(onFailure);
+        List<Long> outputParameters = Opcodes.get(instructionOpcode).map(opcode -> opcode.run(argList)).orElseThrow(onFailure);
         if(outputParameters.size() == 1) {
             if (outputParameters.get(0) != null) {
-                marker = outputParameters.get(0);
+                marker = Math.toIntExact(outputParameters.get(0));
             }
         } else {
             marker += outputParameters.get(0);
         }
         if (outputParameters.size() == 3) {
-            program.set(outputParameters.get(1), outputParameters.get(2));
+            int destinationIndex = Math.toIntExact(outputParameters.get(1));
+            if(destinationIndex>program.size()-1){
+                for(int i=program.size(); i <= destinationIndex; i++){
+                    program.add(0L);
+                }
+            }
+            program.set(destinationIndex, outputParameters.get(2));
         }
         if (outputParameters.size() == 2){
             if(instructionOpcode == 3){
-                program.set(outputParameters.get(1), inputQueue.poll());
+                int destinationIndex = Math.toIntExact(outputParameters.get(1));
+                if(destinationIndex>program.size()-1){
+                    for(int i=program.size(); i <= destinationIndex; i++){
+                        program.add(0L);
+                    }
+                }
+                program.set(destinationIndex, inputQueue.poll());
             } else if(instructionOpcode == 4){
                 output.add(outputParameters.get(1));
+            } else if(instructionOpcode == 9){
+                relativeBase += outputParameters.get(1);
             }
         }
     }
 
-    List<Integer> getProgram() {
+    List<Long> getProgram() {
         return program;
     }
 
     enum Opcodes {
         SUM(1, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(1L);
             toReturn.add(argList.get(2));
             toReturn.add(argList.get(0) + argList.get(1));
             return toReturn;
         }),
         MULTIPLY(2, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(1L);
             toReturn.add(argList.get(2));
             toReturn.add(argList.get(0) * argList.get(1));
             return toReturn;
         }),
         STORE(3, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(-1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(-1L);
             toReturn.add(argList.get(0));
             return toReturn;
         }),
         OUTPUTS(4, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(-1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(-1L);
             toReturn.add(argList.get(0));
             return toReturn;
         }),
         JUMPIFTRUE(5, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
+            List<Long> toReturn = new ArrayList<>();
             if(argList.get(0)!=0) {
                 toReturn.add(argList.get(1));
             } else {
@@ -131,7 +154,7 @@ public class CleverIntcodeProgram {
             return toReturn;
         }),
         JUMPIFFALSE(6, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
+            List<Long> toReturn = new ArrayList<>();
             if(argList.get(0)==0) {
                 toReturn.add(argList.get(1));
             } else {
@@ -140,25 +163,31 @@ public class CleverIntcodeProgram {
             return toReturn;
         }),
         LESSTHAN(7, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(1L);
             toReturn.add(argList.get(2));
             if(argList.get(0) < argList.get(1)) {
-                toReturn.add(1);
+                toReturn.add(1L);
             } else {
-                toReturn.add(0);
+                toReturn.add(0L);
             }
             return toReturn;
         }),
         EQUALS(8, argList -> {
-            List<Integer> toReturn = new ArrayList<>();
-            toReturn.add(1);
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(1L);
             toReturn.add(argList.get(2));
             if(argList.get(0).equals(argList.get(1))) {
-                toReturn.add(1);
+                toReturn.add(1L);
             } else {
-                toReturn.add(0);
+                toReturn.add(0L);
             }
+            return toReturn;
+        }),
+        ADJUST_RELATIVE_BASE_OFFSET(9, argList -> {
+            List<Long> toReturn = new ArrayList<>();
+            toReturn.add(-1L);
+            toReturn.add(argList.get(0));
             return toReturn;
         });
 
@@ -181,7 +210,7 @@ public class CleverIntcodeProgram {
 
     @FunctionalInterface
     interface Opcode {
-        List<Integer> run(List<Integer> argList);
+        List<Long> run(List<Long> argList);
     }
 
     protected Supplier<RuntimeException> fail(){
@@ -206,39 +235,58 @@ public class CleverIntcodeProgram {
         }
     }
 
-    protected List<Integer> getAllArguments(OpcodeAndModes opcodeAndModes){
-        List<Integer> allArguments = new ArrayList<>();
+    protected List<Long> getAllArguments(OpcodeAndModes opcodeAndModes){
+        List<Long> allArguments = new ArrayList<>();
         try {
             allArguments.add(getArgument(opcodeAndModes.par1mode));
         } catch (IndexOutOfBoundsException e) {
+            allArguments.add(0L);
             //we are aware that we not always are able to get all arguments, but we need to remember to update marker
 //            marker++;
         }
         try {
             allArguments.add(getArgument(opcodeAndModes.par2mode));
         } catch (IndexOutOfBoundsException e) {
+            allArguments.add(0L);
             //we are aware that we not always are able to get all arguments, but we need to remember to update marker
 //            marker++;
         }
         try {
             allArguments.add(program.get(++marker));
         } catch (IndexOutOfBoundsException e) {
+            allArguments.add(0L);
             //we are aware that we not always are able to get all arguments, but we need to remember to update marker
 //            marker++;
         }
         return allArguments;
     }
 
-    private int getArgument(Integer parMode) throws IndexOutOfBoundsException{
-        int arg = 0;
+    private long getArgument(Integer parMode) throws IndexOutOfBoundsException{
+        long arg = 0;
+        int position;
         try {
             switch (parMode){
                 case POSITION_MODE:
-                    int position = program.get(++marker);
+                    if(instruction.opcode==3){
+                        return program.get(++marker);
+                    }
+                    position = Math.toIntExact(program.get(++marker));
+                    assert position>=0;
                     arg = program.get(position);
                     return arg;
                 case IMMEDIATE_MODE:
                     arg = program.get(++marker);
+                    return arg;
+                case RELATIVE_MODE:
+//                    if(instruction.opcode==3){
+//                        return (program.get(++marker) + relativeBase) ;
+//                    }
+                    position = Math.toIntExact(program.get(++marker)) + relativeBase;
+                    assert position>=0;
+//                    if(instruction.opcode ==3){
+//                        return position;
+//                    }
+                    arg = program.get(position);
                     return arg;
                 default:
                     throw new IllegalArgumentException();

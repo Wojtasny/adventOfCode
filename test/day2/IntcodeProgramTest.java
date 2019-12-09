@@ -6,20 +6,22 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class IntcodeProgramTest {
 
     private static int[] programCodeArray;
-    private static List<Integer> programCodeList = new ArrayList<>();
+    private static List<Long> programCodeList = new ArrayList<>();
 
     @Test
     public void validateSampleInputOnCleverProgram(){
-        int[] intcodeInput = {1,0,0,0,99};
-        List<Integer> intcodeOuput = Arrays.asList(2,0,0,0,99);
+        long[] intcodeInput = {1,0,0,0,99};
+        List<Long> intcodeOuput = Stream.of(2,0,0,0,99).map(Long::new).collect(Collectors.toList());
         CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
         cip.execute();
         assertEquals(intcodeOuput, cip.getProgram());
@@ -27,8 +29,8 @@ class IntcodeProgramTest {
 
     @Test
     public void validateSampleInputOnCleverProgram2(){
-        int[] intcodeInput = {1,1,1,4,99,5,6,0,99};
-        List<Integer> intcodeOuput = Arrays.asList(30,1,1,4,2,5,6,0,99);
+        long[] intcodeInput = {1,1,1,4,99,5,6,0,99};
+        List<Long> intcodeOuput = Arrays.asList(30,1,1,4,2,5,6,0,99).stream().map(Long::new).collect(Collectors.toList());
         CleverIntcodeProgram cip = new CleverIntcodeProgram(Arrays.stream(intcodeInput).boxed().collect(Collectors.toList()));
         cip.execute();
         assertEquals(intcodeOuput, cip.getProgram());
@@ -87,8 +89,8 @@ class IntcodeProgramTest {
 
     @Test
     void processExcerciseInputWithCleverProgram(){
-        programCodeList.set(1, 12);
-        programCodeList.set(2, 2);
+        programCodeList.set(1, 12L);
+        programCodeList.set(2, 2L);
         CleverIntcodeProgram cip = new CleverIntcodeProgram(programCodeList);
         cip.execute();
         assertEquals( 2692315, cip.getProgram().get(0));
@@ -105,10 +107,10 @@ class IntcodeProgramTest {
     @Test
     void findVerbAndNounWithCleverProgram(){
         final int expectedOutput = 19690720;
-        int result =0;
-        for(int noun=0; noun<=99; noun++) {
-            for (int verb = 0; verb <= 99; verb++) {
-                List<Integer> programCode = new ArrayList<>(programCodeList);
+        long result =0;
+        for(long noun=0; noun<=99; noun++) {
+            for (long verb = 0; verb <= 99; verb++) {
+                List<Long> programCode = new ArrayList<>(programCodeList);
                 AdvancedCleverIntcodeProgram advancedCleverIntcodeProgram = new AdvancedCleverIntcodeProgram(programCode, noun, verb);
                 try {
                     advancedCleverIntcodeProgram.execute();
@@ -156,7 +158,7 @@ class IntcodeProgramTest {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line = br.readLine();
         List<String> programCodeString = Arrays.asList(line.split(","));
-        programCodeList = programCodeString.stream().map(Integer::parseInt).collect(Collectors.toList());
+        programCodeList = programCodeString.stream().map(Long::parseLong).collect(Collectors.toList());
         programCodeArray = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray();
 //        System.out.println(Arrays.toString(programCodeArray));
     }

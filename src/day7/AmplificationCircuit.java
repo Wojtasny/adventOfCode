@@ -8,10 +8,10 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
 
     private boolean halted = false;
 
-    private Map<int[], Integer> phaseSettingOutputValueMap = new HashMap<>();
-    private Map<int[], Integer> phaseSettingWithFeedbackOutputValueMap = new HashMap<>();
+    private Map<int[], Long> phaseSettingOutputValueMap = new HashMap<>();
+    private Map<int[], Long> phaseSettingWithFeedbackOutputValueMap = new HashMap<>();
 
-    AmplificationCircuit(List<Integer> program){
+    AmplificationCircuit(List<Long> program){
         super(program);
         int[] permutationInitArray = {0, 1, 2, 3, 4};
         getAllPermutations(permutationInitArray.length, permutationInitArray, permutationList);
@@ -53,24 +53,24 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
 
     int findGreatestOutput(){
         for (int[] inputs: permutationList){
-            int inputSignal = 0;
+            long inputSignal = 0;
             for (int phaseSetting :
                     inputs) {
-                this.inputQueue.offer(phaseSetting);
-                this.inputQueue.offer(inputSignal);
+                this.inputQueue.offer((long)phaseSetting);
+                this.inputQueue.offer((long)inputSignal);
                 super.execute();
                 inputSignal = this.getResult();
             }
-            int finalResult = inputSignal;
+            long finalResult = inputSignal;
             phaseSettingOutputValueMap.put(inputs, finalResult);
         }
-        int[] highestOutputPhases = Collections.max(phaseSettingOutputValueMap.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
+        int[] highestOutputPhases = Collections.max(phaseSettingOutputValueMap.entrySet(), Comparator.comparingLong(Map.Entry::getValue)).getKey();
         System.out.println(Arrays.toString(highestOutputPhases));
 
-        return Collections.max(phaseSettingOutputValueMap.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getValue();
+        return Math.toIntExact(Collections.max(phaseSettingOutputValueMap.entrySet(), Comparator.comparingLong(Map.Entry::getValue)).getValue());
     }
 
-    int findGreatestOutputWithFeedback(){
+    long findGreatestOutputWithFeedback(){
         for(int [] phaseSettings: permutationFeedbackList){
             int inputSignal = 0;
             AmplificationCircuit amplifier1 = new AmplificationCircuit(inputProgram);
@@ -79,52 +79,52 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
             AmplificationCircuit amplifier4 = new AmplificationCircuit(inputProgram);
             AmplificationCircuit amplifier5 = new AmplificationCircuit(inputProgram);
 
-            amplifier1.inputQueue.offer(phaseSettings[0]);
-            amplifier2.inputQueue.offer(phaseSettings[1]);
-            amplifier3.inputQueue.offer(phaseSettings[2]);
-            amplifier4.inputQueue.offer(phaseSettings[3]);
-            amplifier5.inputQueue.offer(phaseSettings[4]);
+            amplifier1.inputQueue.offer((long)phaseSettings[0]);
+            amplifier2.inputQueue.offer((long)phaseSettings[1]);
+            amplifier3.inputQueue.offer((long)phaseSettings[2]);
+            amplifier4.inputQueue.offer((long)phaseSettings[3]);
+            amplifier5.inputQueue.offer((long)phaseSettings[4]);
 
-            amplifier1.inputQueue.offer(inputSignal);
+            amplifier1.inputQueue.offer((long)inputSignal);
 
             while(!amplifier1.isHalted()){
-                int amplifier1Output = amplifier1.executeWithFeedback();
+                long amplifier1Output = amplifier1.executeWithFeedback();
                 amplifier2.inputQueue.offer(amplifier1Output);
-                int amplifier2Output = amplifier2.executeWithFeedback();
+                long amplifier2Output = amplifier2.executeWithFeedback();
                 amplifier3.inputQueue.offer(amplifier2Output);
-                int amplifier3Output = amplifier3.executeWithFeedback();
+                long amplifier3Output = amplifier3.executeWithFeedback();
                 amplifier4.inputQueue.offer(amplifier3Output);
-                int amplifier4Output = amplifier4.executeWithFeedback();
+                long amplifier4Output = amplifier4.executeWithFeedback();
                 amplifier5.inputQueue.offer(amplifier4Output);
-                int amplifier5Output = amplifier5.executeWithFeedback();
+                long amplifier5Output = amplifier5.executeWithFeedback();
                 amplifier1.inputQueue.offer(amplifier5Output);
             }
             phaseSettingWithFeedbackOutputValueMap.put(phaseSettings, amplifier5.getResult());
         }
-        int[] highestOutputPhases = Collections.max(phaseSettingWithFeedbackOutputValueMap.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
+        int[] highestOutputPhases = Collections.max(phaseSettingWithFeedbackOutputValueMap.entrySet(), Comparator.comparingLong(Map.Entry::getValue)).getKey();
         System.out.println(Arrays.toString(highestOutputPhases));
 
-        return Collections.max(phaseSettingWithFeedbackOutputValueMap.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getValue();
+        return Collections.max(phaseSettingWithFeedbackOutputValueMap.entrySet(), Comparator.comparingLong(Map.Entry::getValue)).getValue();
     }
 
-    private int executeWithFeedback(){
+    private long executeWithFeedback(){
 
-        OpcodeAndModes instruction = parseInstructionOpcode(program.get(marker));
+        OpcodeAndModes instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
 
         while(!TERMINATING_OPCODE.equals(instruction.opcode)){
-            List<Integer> argList = getAllArguments(instruction);
+            List<Long> argList = getAllArguments(instruction);
             singleInstruction(instruction.opcode, argList, fail());
 
             if(4 == instruction.opcode){
                 return lastOutput();
             }
-            instruction = parseInstructionOpcode(program.get(marker));
+            instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
         }
         halted = true;
         return lastOutput();
     }
 
-    private int lastOutput() {
+    private long lastOutput() {
         return output.get(output.size()-1);
     }
 

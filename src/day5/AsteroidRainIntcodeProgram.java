@@ -14,67 +14,67 @@ class AsteroidRainIntcodeProgram {
     private static final int THIRD_ARG = 3;
     private static final Integer TERMINATING_OPCODE = 99;
 
-    private List<Integer> inputProgram = new ArrayList<>();
-    private List<Integer> output = new ArrayList<>();
+    private List<Long> inputProgram = new ArrayList<>();
+    private List<Long> output = new ArrayList<>();
     private int marker;
 
-    void setInputProgram(List<Integer> inputProgram) {
+    void setInputProgram(List<Long> inputProgram) {
         this.inputProgram = inputProgram;
     }
 
-    void setInputValue(int inputValue) {
+    void setInputValue(long inputValue) {
         this.inputValue = inputValue;
     }
 
-    private int inputValue;
+    private long inputValue;
 
     AsteroidRainIntcodeProgram() {
     }
 
-    private int getResult() {
+    private long getResult() {
         return output.get(output.size()-1);
     }
 
-    private List<Integer> program = new ArrayList<>();
+    private List<Long> program = new ArrayList<>();
 
-    int execute(){
+    long execute(){
         program.addAll(inputProgram);
         marker = 0;
-        int par1 ;
-        int par2 ;
+        long par1 ;
+        long par2 ;
         int par3 ;
-        SingleInstruction instruction = parseInstructionOpcode(program.get(marker));
+        SingleInstruction instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
         while(!TERMINATING_OPCODE.equals(instruction.opcode)){
             switch (instruction.opcode){
                 case 1:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
-                    par3 = program.get(marker+THIRD_ARG);
+                    par3 = Math.toIntExact(program.get(marker+THIRD_ARG));
                     operationSum(par1, par2, par3);
                     marker+=4;
                     break;
                 case 2:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
-                    par3 = program.get(marker+THIRD_ARG);
+                    par3 = Math.toIntExact(program.get(marker+THIRD_ARG));
                     operationMulti(par1, par2, par3);
                     marker+=4;
                     break;
                 case 3:
                     par1 = getArgument(1, FIRST_ARG);
-                    program.set(par1,inputValue);
+                    program.set(Math.toIntExact(par1),inputValue);
                     marker+=2;
                     break;
                 case 4:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
-                    output.add(par1);
+                    output.add((long)par1);
                     marker+=2;
                     break;
                 case 5:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
                     if(par1 !=0) {
-                        marker = par2;
+                        marker = Math.toIntExact(par2);
                     } else {
                         marker+=3;
                     }
@@ -83,7 +83,7 @@ class AsteroidRainIntcodeProgram {
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
                     if(par1==0) {
-                        marker =par2;
+                        marker = Math.toIntExact(par2);
                     } else {
                         marker+=3;
                     }
@@ -91,44 +91,44 @@ class AsteroidRainIntcodeProgram {
                 case 7:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
-                    par3 = program.get(marker+THIRD_ARG);
+                    par3 = Math.toIntExact(program.get(marker+THIRD_ARG));
                     if(par1<par2) {
-                        program.set(par3, 1);
+                        program.set(par3, 1L);
                     } else {
-                        program.set(par3, 0);
+                        program.set(par3, 0L);
                     }
                     marker+=4;
                     break;
                 case 8:
                     par1 = getArgument(instruction.par1mode, FIRST_ARG);
                     par2 = getArgument(instruction.par2mode, SECOND_ARG);
-                    par3 = program.get(marker+THIRD_ARG);
+                    par3 = Math.toIntExact(program.get(marker+THIRD_ARG));
                     if(par1==par2) {
-                        program.set(par3, 1);
+                        program.set(par3, 1L);
                     } else {
-                        program.set(par3, 0);
+                        program.set(par3, 0L);
                     }
                     marker+=4;
             }
-            instruction = parseInstructionOpcode(program.get(marker));
+            instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
         }
         return getResult();
     }
 
 
-    private void operationMulti(int par1, int par2, int par3) {
+    private void operationMulti(long par1, long par2, int par3) {
         program.set(par3, par1*par2);
     }
 
-    private void operationSum(int par1, int par2, int par3) {
-        program.set(par3,par1+par2);
+    private void operationSum(long par1, long par2, int par3) {
+        program.set(par3,((long) par1+par2));
     }
 
-    private int getArgument(Integer par1mode, int nthArg) {
-        int arg ;
+    private long getArgument(Integer par1mode, int nthArg) {
+        long arg ;
         switch (par1mode){
             case POSITION_MODE:
-                int position = program.get(marker+nthArg);
+                int position = Math.toIntExact(program.get(marker+nthArg));
                 arg = program.get(position);
                return arg;
             case IMMEDIATE_MODE:
