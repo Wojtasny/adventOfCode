@@ -252,7 +252,11 @@ public class CleverIntcodeProgram {
 //            marker++;
         }
         try {
-            allArguments.add(program.get(++marker));
+            if(opcodeAndModes.par3mode ==2){
+                allArguments.add(program.get(++marker)+relativeBase);
+            } else {
+                allArguments.add(program.get(++marker));
+            }
         } catch (IndexOutOfBoundsException e) {
             allArguments.add(0L);
             //we are aware that we not always are able to get all arguments, but we need to remember to update marker
@@ -267,9 +271,9 @@ public class CleverIntcodeProgram {
         try {
             switch (parMode){
                 case POSITION_MODE:
-                    if(instruction.opcode==3){
-                        return program.get(++marker);
-                    }
+//                    if(instruction.opcode==3){
+//                        return program.get(++marker);
+//                    }
                     position = Math.toIntExact(program.get(++marker));
                     assert position>=0;
                     arg = program.get(position);
@@ -281,11 +285,11 @@ public class CleverIntcodeProgram {
 //                    if(instruction.opcode==3){
 //                        return (program.get(++marker) + relativeBase) ;
 //                    }
-                    position = Math.toIntExact(program.get(++marker)) + relativeBase;
+                    position = relativeBase + Math.toIntExact(program.get(++marker));
                     assert position>=0;
-//                    if(instruction.opcode ==3){
-//                        return position;
-//                    }
+                    if(instruction.opcode ==3){
+                        return position;
+                    }
                     arg = program.get(position);
                     return arg;
                 default:

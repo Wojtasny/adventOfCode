@@ -47,6 +47,19 @@ public class SensorBoostTest {
         CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
         cleverIntcodeProgram.offerInputValue(1L);
         cleverIntcodeProgram.execute();
-        System.out.println(cleverIntcodeProgram.getOutputList().toString());
+        assertEquals("3235019597", cleverIntcodeProgram.getOutputList().get(0).toString());
+    }
+
+    @Test
+    void validateInputPar2() throws IOException {
+        File file = new File("C:\\Users\\PTM867\\Documents\\adventOfCode\\resources\\inputday9.txt");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line = br.readLine();
+
+        List<Long> programInstruction = Arrays.stream(line.split(",")).map(Long::new).collect(Collectors.toList());
+        CleverIntcodeProgram cleverIntcodeProgram = new CleverIntcodeProgram(programInstruction);
+        cleverIntcodeProgram.offerInputValue(2L);
+        cleverIntcodeProgram.execute();
+        assertEquals("80274", cleverIntcodeProgram.getOutputList().get(0).toString());
     }
 }
