@@ -12,126 +12,135 @@ public class MonitoringStation {
     private List<Coordinates> coordinatesToSkip = new ArrayList<>();
     private Map<Coordinates, Integer> asteroidVisibleCount = new HashMap<>();
 
-    void parseMap(String mapString){
+    void parseMap(String mapString) {
         List<String> rows = Arrays.asList(mapString.split("\n"));
         width = rows.get(0).length();
         height = rows.size();
         map = new Integer[height][width];
-        int x=0;
-        int y=0;
-        for(String row: rows){
-            Integer[] rowOfOnes = row.chars().mapToObj(c -> (char) c).map(character -> character=='#').map(aBoolean -> aBoolean?1:0).toArray(Integer[]::new);
+        int x = 0;
+        int y = 0;
+        for (String row : rows) {
+            Integer[] rowOfOnes = row.chars().mapToObj(c -> (char) c).map(character -> character == '#').map(aBoolean -> aBoolean ? 1 : 0).toArray(Integer[]::new);
             map[x++] = rowOfOnes;
         }
         generateCoordinatesList();
-        showMap();
+//        showMap();
         countForAllAsteroids();
     }
 
+    int getHighestCount(){
+        return Collections.max(asteroidVisibleCount.entrySet(),Comparator.comparing(Map.Entry::getValue)).getValue();
+    }
+
     private void countForAllAsteroids() {
-        for(Coordinates coordinate: coordinatesList){
+        for (Coordinates coordinate : coordinatesList) {
             coordinatesToSkip.clear();
             int count = countForAsteroid(coordinate);
-            if(count!=0) {
+            if (count != 0) {
                 asteroidVisibleCount.put(coordinate, count);
             }
         }
     }
 
-    private int countForAsteroid(Coordinates coor){
+    private int countForAsteroid(Coordinates coor) {
         // 0 means there is no asteroid at this point
-        if((map[coor.getY()][coor.getX()]) == 0) return 0;
+        if ((map[coor.getY()][coor.getX()]) == 0) return 0;
         currentCoordinate = coor;
         int counter = 0;
 
-        for (Coordinates coordinates: coordinatesList){
-            if(coordinates.equals(currentCoordinate)) continue;
-            if(map[coordinates.getY()][coordinates.getX()] != 1) continue;
-            if(coordinatesToSkip.contains(coordinates)) continue;
-            counter+=countOnLine(coordinates);
+        for (Coordinates coordinates : coordinatesList) {
+            if (coordinates.equals(currentCoordinate)) continue;
+            if (map[coordinates.getY()][coordinates.getX()] != 1) continue;
+            if (coordinatesToSkip.contains(coordinates)) continue;
+            if (!isSomethingBetween(coordinates)) counter++;
+//            counter+=countOnLine(coordinates);
         }
         return counter;
     }
 
-    private int countOnLine(Coordinates c){
-        double a;
-        int innerCounter=0;
-        Set<Coordinates> onLineAsteroids = new HashSet<>();
-        Map<Coordinates, Integer> smaller = new HashMap<>();
-        Map<Coordinates, Integer> higher = new HashMap<>();
-        if(c.getX()==currentCoordinate.getX()){
-            onLineAsteroids = getAsteroidsOnVerticalLine(currentCoordinate.getX());
-            for (Coordinates coordinates :
-                    onLineAsteroids) {
-                int dist = currentCoordinate.getY()-coordinates.getY();
-                if(dist<0){
-                    higher.put(coordinates,dist);
-                } else {
-                    smaller.put(coordinates,dist);
-                }
-            }
-        } else {
-            nwd()
-            int deltaY
-            int deltaX
-            onLineAsteroids = getAsteroidsOnLine(a, b);
+    private boolean isSomethingBetween(Coordinates coordinates) {
+        int distX = Math.abs(coordinates.getX() - currentCoordinate.getX());
+        int distY = Math.abs(coordinates.getY() - currentCoordinate.getY());
+        if (distX == 0) {
+            return isBetweenVertical(distY, coordinates);
+        }
+        if (distY == 0) {
+            return isBetweenHorizontal(distX, coordinates);
+        }
+//        if (isPrime(distX) || isPrime(distY)) {
+//            return false;
+//        }
+        int divisor = findHighestCommonDivisor(distX, distY);
+        if (divisor == 1) {
+            return false;
+        }
+        int deltaX = distX / divisor;
+        int deltaY = distY / divisor;
 
-            for (Coordinates coordinates :
-                    onLineAsteroids) {
-                int dist = currentCoordinate.getX()-coordinates.getX();
-                if(dist<0){
-                    higher.put(coordinates,dist);
-                } else {
-                    smaller.put(coordinates,dist);
-                }
+        int xStart = Math.min(coordinates.getX(), currentCoordinate.getX());
+        int xEnd = Math.max(coordinates.getX(), currentCoordinate.getX());
+        int yStart = Math.min(coordinates.getY(), currentCoordinate.getY());
+        if(currentCoordinate.getX() == xStart){
+            if(yStart!=currentCoordinate.getY()){
+                yStart=currentCoordinate.getY();
+                deltaY = -deltaY;
+            }
+        } else{
+            if(yStart!=coordinates.getY()){
+                yStart=coordinates.getY();
+                deltaY =-deltaY;
             }
         }
 
-        if(!smaller.isEmpty()){
-            coordinatesToSkip.addAll(smaller.keySet());
-            innerCounter++;
+        for (int m = 1; (m * deltaX + xStart) < xEnd; m += deltaX) {
+            if (map[yStart + m * deltaY][xStart + m * deltaX] == 1) {
+                return true;
+            }
         }
-        if (!higher.isEmpty()) {
-            coordinatesToSkip.addAll(higher.keySet());
-            innerCounter++;
-        }
-        return innerCounter;
+        return false;
     }
 
-    private Set<Coordinates> getAsteroidsOnVerticalLine(int x) {
-        Set<Coordinates> asteroidsOnLine = new HashSet<>();
-        for(int y=0;y<height;y++){
-            if(map[y][x] ==1 && currentCoordinate.getY()!=y){
-                asteroidsOnLine.add(new Coordinates(x, (int) y));
+    private boolean isBetweenHorizontal(int distX, Coordinates coordinates) {
+        int xStart = Math.min(coordinates.getX(), currentCoordinate.getX());
+        int xEnd = Math.max(coordinates.getX(), currentCoordinate.getX());
+        for (int i = xStart + 1; i < xEnd; i++) {
+            if (map[currentCoordinate.getY()][i] == 1) {
+                return true;
             }
         }
-        return asteroidsOnLine;
+        return false;
     }
 
-
-    // TODO: 11.12.2019 DO zmiany
-    private Set<Coordinates> getAsteroidsOnLine(double a, double b) {
-        Set<Coordinates> asteroidsOnLine = new HashSet<>();
-        for(int x=0; x<width; x++){
-            double y = a*x+b;
-            if(y == Math.floor(y) && y>=0 && y<height && map[(int) y][x] ==1 && currentCoordinate.getX()!=x){
-                asteroidsOnLine.add(new Coordinates(x, (int) y));
+    private boolean isBetweenVertical(Integer distY, Coordinates coordinates) {
+        int yStart = Math.min(coordinates.getY(), currentCoordinate.getY());
+        int yEnd = Math.max(coordinates.getY(), currentCoordinate.getY());
+        for (int i = yStart + 1; i < yEnd; i++) {
+            if (map[i][currentCoordinate.getX()] == 1) {
+                return true;
             }
         }
-        return asteroidsOnLine;
+        return false;
+    }
+
+    private int findHighestCommonDivisor(int n1, int n2) {
+        if (n2 == 0) {
+            return n1;
+        }
+        return findHighestCommonDivisor(n2, n1 % n2);
     }
 
     private void showMap() {
-        for (Integer[] inty: map) {
+        for (Integer[] inty : map) {
             System.out.println(Arrays.toString(inty));
         }
     }
 
-    private class Coordinates{
+    private class Coordinates {
 
         int getX() {
             return x;
         }
+
         int getY() {
             return y;
         }
@@ -139,6 +148,7 @@ public class MonitoringStation {
         int x;
 
         int y;
+
         Coordinates(int x, int y) {
             this.x = x;
             this.y = y;
@@ -146,14 +156,15 @@ public class MonitoringStation {
 
         @Override
         public boolean equals(Object obj) {
-            if(!(obj instanceof Coordinates)) return false;
+            if (!(obj instanceof Coordinates)) return false;
             Coordinates toCompare = (Coordinates) obj;
             return this.getX() == toCompare.getX() && this.getY() == toCompare.getY();
         }
     }
+
     private void generateCoordinatesList() {
-        for(int i=0; i<height; i++) {
-            for( int n=0;n<width;n++){
+        for (int i = 0; i < height; i++) {
+            for (int n = 0; n < width; n++) {
                 coordinatesList.add(new Coordinates(n, i));
             }
         }
