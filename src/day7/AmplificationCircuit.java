@@ -109,7 +109,7 @@ public class AmplificationCircuit extends CleverIntcodeProgram {
 
     private long executeWithFeedback(){
 
-        OpcodeAndModes instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
+        instruction = parseInstructionOpcode(Math.toIntExact(program.get(marker)));
 
         while(!TERMINATING_OPCODE.equals(instruction.opcode)){
             List<Long> argList = getAllArguments(instruction);

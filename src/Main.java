@@ -13,7 +13,7 @@ public class Main {
 //                test.toCharArray()) {
 //            System.out.println(c);
 //        }
-        double i =2;
+        int i =-4;
         int k=4;
         System.out.println(i/k);
     }

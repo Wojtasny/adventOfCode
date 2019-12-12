@@ -14,7 +14,7 @@ public class CleverIntcodeProgram {
 
     protected List<Long> inputProgram = new ArrayList<>();
     protected List<Long> program = new ArrayList<>();
-    private OpcodeAndModes instruction;
+    protected OpcodeAndModes instruction;
 
     public List<Long> getOutputList() {
         return output;
@@ -24,6 +24,10 @@ public class CleverIntcodeProgram {
 
     public void offerInputValue(Long inputValue) {
         this.inputQueue.offer(inputValue);
+    }
+
+    public Long getInputValue(){
+        return inputQueue.poll();
     }
 
     protected Deque<Long> inputQueue = new ArrayDeque<>();
@@ -104,7 +108,7 @@ public class CleverIntcodeProgram {
                         program.add(0L);
                     }
                 }
-                program.set(destinationIndex, inputQueue.poll());
+                program.set(destinationIndex, getInputValue());
             } else if(instructionOpcode == 4){
                 output.add(outputParameters.get(1));
             } else if(instructionOpcode == 9){
@@ -271,9 +275,9 @@ public class CleverIntcodeProgram {
         try {
             switch (parMode){
                 case POSITION_MODE:
-//                    if(instruction.opcode==3){
-//                        return program.get(++marker);
-//                    }
+                    if(instruction.opcode==3){
+                        return program.get(++marker);
+                    }
                     position = Math.toIntExact(program.get(++marker));
                     assert position>=0;
                     arg = program.get(position);

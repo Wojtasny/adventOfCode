@@ -70,7 +70,7 @@ public class MonitoringStation {
 //        if (isPrime(distX) || isPrime(distY)) {
 //            return false;
 //        }
-        int divisor = findHighestCommonDivisor(distX, distY);
+        int divisor = findHighestCommonDivisor(Math.abs(distX), Math.abs(distY));
         if (divisor == 1) {
             return false;
         }
@@ -78,22 +78,35 @@ public class MonitoringStation {
         int deltaY = distY / divisor;
 
         int xStart = Math.min(coordinates.getX(), currentCoordinate.getX());
-        int xEnd = Math.max(coordinates.getX(), currentCoordinate.getX());
-        int yStart = Math.min(coordinates.getY(), currentCoordinate.getY());
+        int xEnd =   Math.max(coordinates.getX(), currentCoordinate.getX());
+        int yStart;
+//        if(deltaY<0){
+//            yStart = Math.max(coordinates.getY(), currentCoordinate.getY());
+//        } else {
+//            yStart = Math.min(coordinates.getY(), currentCoordinate.getY());
+//        }
         if(currentCoordinate.getX() == xStart){
-            if(yStart!=currentCoordinate.getY()){
+            //tutaj current jest na początku
+            if(currentCoordinate.getY()>coordinates.getY()){
                 yStart=currentCoordinate.getY();
-                deltaY = -deltaY;
+                deltaY = 0 -deltaY;
+            } else {
+                yStart=currentCoordinate.getY();
             }
         } else{
-            if(yStart!=coordinates.getY()){
+            //tutaj coordinates jest na początku
+            if(coordinates.getY()>currentCoordinate.getY()){
                 yStart=coordinates.getY();
-                deltaY =-deltaY;
+                deltaY = 0 -deltaY;
+            } else {
+                yStart=coordinates.getY();
             }
         }
 
         for (int m = 1; (m * deltaX + xStart) < xEnd; m += deltaX) {
-            if (map[yStart + m * deltaY][xStart + m * deltaX] == 1) {
+            int y = yStart + (m * deltaY);
+            int x = xStart + (m * deltaX);
+            if (map[y][x] == 1) {
                 return true;
             }
         }
